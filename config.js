@@ -2,6 +2,6 @@
 // this site's origin; see README.md.
 window.PICKER_CONFIG = {
   CLIENT_ID: '99895689100-b32o1odf30o2qt0cmgjmk2k7sat7v43s.apps.googleusercontent.com',
-  API_KEY: 'YOUR_API_KEY',
+  API_KEY: 'AIzaSyB1fWi2f40SOFt1LACCFfjI-E-gdXgCWZw',
   APP_ID: '99895689100',
 };
