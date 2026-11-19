@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>KaymazingMind: Google Drive</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f7f5f0; --ink: #1d1d1f; --muted: #5f5f66; --accent: #3b5bdb; --card: #fff; --err: #b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #161618; --ink: #f2f2f3; --muted: #a0a0a8; --accent: #8ea2ff; --card: #1f1f22; --err: #ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width: 100%; max-width: 420px; padding: 32px 24px; background: var(--card); border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,.08); text-align: center; }
+  h1 { margin: 0 0 8px; font-size: 22px; }
+  p { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+  button { font: inherit; font-weight: 600; padding: 12px 20px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  #status { min-height: 1.5em; margin: 16px 0 0; font-size: 14px; }
+  #status.error { color: var(--err); }
+  a { color: var(--accent); }
+  .foot { margin: 24px 0 0; font-size: 13px; }
+  section p[lang] { font-style: italic; }
+</style>
+</head>
+<body>
+<main>
+  <section id="picker" hidden>
+    <h1>KaymazingMind</h1>
+    <p>Pick a file from Google Drive to attach to your task. Only the file you choose is shared with the app; nothing else in your Drive is accessed.</p>
+    <button id="choose" type="button" disabled>Choose from Google Drive</button>
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+  <section id="home">
+    <h1>KaymazingMind</h1>
+    <p>KaymazingMind is a personal productivity app for macOS: infinite canvases, to-do lists, Kanban boards and notes in one place, with optional Google Calendar and Google Drive integration.</p>
+    <p lang="tr">KaymazingMind, macOS için kişisel bir üretkenlik uygulamasıdır: sonsuz tuvaller, yapılacaklar listeleri, Kanban panoları ve notlar tek yerde; isteğe bağlı Google Takvim ve Google Drive bağlantısıyla.</p>
+    <p>This page also hosts the Google Drive file picker the app opens from a task.</p>
+  </section>
+  <p class="foot"><a href="privacy.html">Privacy policy · Gizlilik politikası</a></p>
+</main>
+<script src="config.js"></script>
+<script src="picker.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="pickerReady('gis')"></script>
+<script src="https://apis.google.com/js/api.js" async defer onload="pickerReady('api')"></script>
+</body>
+</html>
