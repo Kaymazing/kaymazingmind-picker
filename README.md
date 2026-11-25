@@ -13,6 +13,10 @@ kaymazingmind://drive/picked?task=<id>&id=<fileId>&name=<name>&mime=<mime>&url=<
 kaymazingmind://drive/picked?task=<id>&cancelled=1
 ```
 
+**Sheet mode** (Google Sheets block, KM-438): `<picker site>/?sheet=<block id>` shows only the
+Spreadsheets view and answers `kaymazingmind://drive/picked?sheet=<block id>&id=<fileId>&name=…` (or
+`&cancelled=1`). Picking is what grants the app `drive.file` access to that one sheet.
+
 The access token stays in the page and goes only to Google. `config.js` holds
 three public values (not secrets): the OAuth client id, the API key and the
 Cloud project number. The API key must be restricted by HTTP referrer to this

@@ -10,12 +10,13 @@ function isUuid(s) {
 
 /**
  * The app link for a picker result. `doc` is the picked file
- * ({id, name, mimeType, url, iconUrl}) or null for "cancelled".
+ * ({id, name, mimeType, url, iconUrl}) or null for "cancelled". `kind` is
+ * 'task' (default) or 'sheet' (a Google Sheets block: ?sheet=<block id>).
  * Every value is percent-encoded.
  */
-function buildDeepLink(taskId, doc) {
+function buildDeepLink(subjectId, doc, kind) {
   var q = function (k, v) { return k + '=' + encodeURIComponent(v); };
-  var base = 'kaymazingmind://drive/picked?' + q('task', taskId);
+  var base = 'kaymazingmind://drive/picked?' + q(kind === 'sheet' ? 'sheet' : 'task', subjectId);
   if (!doc) return base + '&cancelled=1';
   var parts = [
     q('id', String(doc.id || '')),
@@ -32,7 +33,10 @@ function buildDeepLink(taskId, doc) {
 var SCOPE = 'https://www.googleapis.com/auth/drive.file';
 var ready = { gis: false, api: false, picker: false };
 var tokenClient = null;
-var taskId = new URLSearchParams(window.location.search).get('task');
+var params = new URLSearchParams(window.location.search);
+var sheetMode = params.get('sheet') !== null && params.get('task') === null;
+// The id the app opened this page for: a task, or (sheet mode) a Sheets block.
+var taskId = sheetMode ? params.get('sheet') : params.get('task');
 
 function el(id) { return document.getElementById(id); }
 
@@ -77,25 +81,27 @@ function leave(url) {
 function onPicker(data) {
   var A = window.google.picker.Action;
   if (data.action === A.PICKED && data.docs && data.docs[0]) {
-    leave(buildDeepLink(taskId, data.docs[0]));
+    leave(buildDeepLink(taskId, data.docs[0], sheetMode ? 'sheet' : 'task'));
   } else if (data.action === A.CANCEL) {
-    leave(buildDeepLink(taskId, null));
+    leave(buildDeepLink(taskId, null, sheetMode ? 'sheet' : 'task'));
   }
 }
 
 function openPicker(accessToken) {
   var P = window.google.picker;
   var c = window.PICKER_CONFIG;
-  var all = new P.DocsView(P.ViewId.DOCS).setIncludeFolders(true);
+  var all = sheetMode
+    ? new P.DocsView(P.ViewId.SPREADSHEETS).setIncludeFolders(true)
+    : new P.DocsView(P.ViewId.DOCS).setIncludeFolders(true);
   var office = new P.DocsView(P.ViewId.DOCS)
     .setMimeTypes(
       'application/vnd.google-apps.document,' +
       'application/vnd.google-apps.spreadsheet,' +
       'application/vnd.google-apps.presentation')
     .setLabel('Docs, Sheets, Slides'); // shown as the tab's name
-  new P.PickerBuilder()
-    .addView(all)
-    .addView(office)
+  var builder = new P.PickerBuilder().addView(all);
+  if (!sheetMode) builder.addView(office);
+  builder
     .setAppId(c.APP_ID)
     .setDeveloperKey(c.API_KEY)
     .setOAuthToken(accessToken) // stays in this page; sent only to Google
@@ -130,10 +136,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // Without ?task this is the app's public home page (Google's consent screen
   // links here); the picker only shows when the app opened it for a task.
   if (taskId === null) return;
+  if (sheetMode) {
+    el('intro').textContent = 'Pick a Google Sheet to show on your KaymazingMind canvas. Only the sheet you choose is shared with the app; nothing else in your Drive is accessed.';
+    el('choose').textContent = 'Choose a Google Sheet';
+  }
   el('home').hidden = true;
   el('picker').hidden = false;
   if (!isUuid(taskId)) {
-    say('This page must be opened from a task in KaymazingMind.', true);
+    say('This page must be opened from KaymazingMind.', true);
   } else if (!configured()) {
     say('This picker is not configured yet (see README.md).', true);
   }
